@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"log"
 	"math"
@@ -12,8 +13,6 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-
-	"crypto/rand"
 )
 
 const grpcPort = 50502
