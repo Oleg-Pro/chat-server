@@ -75,10 +75,9 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*empty.Empty, error) {
 	log.Printf("Delete req: %+v", req)
 
-
 	builderDelete := sq.Delete(chatsTable).
-	PlaceholderFormat(sq.Dollar).
-	Where(sq.Eq{"id": req.GetId()})
+		PlaceholderFormat(sq.Dollar).
+		Where(sq.Eq{"id": req.GetId()})
 
 	query, args, err := builderDelete.ToSql()
 	if err != nil {
@@ -96,7 +95,6 @@ func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*empty.Em
 	}
 
 	log.Printf("delete %d rows", res.RowsAffected())
-
 
 	return &empty.Empty{}, nil
 }
