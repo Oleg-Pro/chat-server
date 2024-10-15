@@ -15,4 +15,10 @@ services:
     volumes:
       - chat_server_postgres_volume:/var/lib/postgresql/data      
 
+  migrator:
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    restart: on-failure      
+
 
