@@ -72,8 +72,31 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 	}, nil
 }
 
-func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*empty.Empty, error) {
+func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*empty.Empty, error) {
 	log.Printf("Delete req: %+v", req)
+
+
+	builderDelete := sq.Delete(chatsTable).
+	PlaceholderFormat(sq.Dollar).
+	Where(sq.Eq{"id": req.GetId()})
+
+	query, args, err := builderDelete.ToSql()
+	if err != nil {
+		log.Printf("Failed to build delete query: %v", err)
+		return &empty.Empty{}, err
+	}
+
+	log.Printf("DELETE SQL query: %s", query)
+
+	//Почему здесь тоже исключение
+	res, err := s.pool.Exec(ctx, query, args...)
+	if err != nil {
+		log.Printf("Failed to delete user with id %d: %v", req.GetId(), err)
+		return &empty.Empty{}, err
+	}
+
+	log.Printf("delete %d rows", res.RowsAffected())
+
 
 	return &empty.Empty{}, nil
 }
@@ -85,6 +108,14 @@ func (s *server) SendMessage(_ context.Context, req *desc.SendMessageRequest) (*
 }
 
 func main() {
+
+	ctx := context.Background()
+	pool, err := pgxpool.Connect(ctx, dbDSN)
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+	defer pool.Close()
+
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
@@ -94,7 +125,7 @@ func main() {
 	s := grpc.NewServer()
 	reflection.Register(s)
 
-	desc.RegisterChatV1Server(s, &server{})
+	desc.RegisterChatV1Server(s, &server{pool: pool})
 	log.Printf("Server listening at %v", listener.Addr())
 
 	if err = s.Serve(listener); err != nil {
