@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE chat (
+CREATE TABLE chats (
     id SERIAL PRIMARY KEY,
     users TEXT NOT NULL UNIQUE    
 );
