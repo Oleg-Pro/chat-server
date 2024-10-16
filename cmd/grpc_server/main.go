@@ -57,7 +57,6 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 		return &desc.CreateResponse{}, err
 	}
 
-
 	var chatID int64
 
 	err = s.pool.QueryRow(ctx, query, args...).Scan(&chatID)
@@ -84,7 +83,6 @@ func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*empty.Em
 		log.Printf("Failed to build delete query: %v", err)
 		return &empty.Empty{}, err
 	}
-
 
 	res, err := s.pool.Exec(ctx, query, args...)
 	if err != nil {
@@ -124,7 +122,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get pg config: %v", err)
 	}
-
 
 	ctx := context.Background()
 	pool, err := pgxpool.Connect(ctx, pgConfig.DSN())
