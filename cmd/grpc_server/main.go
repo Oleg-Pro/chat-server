@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/Oleg-Pro/chat-server/internal/config"
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -15,10 +17,13 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-const grpcPort = 50502
+var configPath string
+
+func init() {
+	flag.StringVar(&configPath, "config-path", ".env", "path to config file")
+}
 
 const (
-	dbDSN      = "host=localhost port=54322 dbname=chat-server user=chat-server-user password=chat-server-password sslmode=disable"
 	chatsTable = "chats"
 )
 
@@ -52,14 +57,9 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 		return &desc.CreateResponse{}, err
 	}
 
-	fmt.Printf("SQL Query: %s\n", query)
-
-	fmt.Printf("Args: %v %T\n", args, args)
-	fmt.Printf("Users: %v %T\n", users, users)
 
 	var chatID int64
 
-	//Почему паника возникает здесь?
 	err = s.pool.QueryRow(ctx, query, args...).Scan(&chatID)
 
 	if err != nil {
@@ -85,9 +85,7 @@ func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*empty.Em
 		return &empty.Empty{}, err
 	}
 
-	log.Printf("DELETE SQL query: %s", query)
 
-	//Почему здесь тоже исключение
 	res, err := s.pool.Exec(ctx, query, args...)
 	if err != nil {
 		log.Printf("Failed to delete user with id %d: %v", req.GetId(), err)
@@ -106,18 +104,38 @@ func (s *server) SendMessage(_ context.Context, req *desc.SendMessageRequest) (*
 }
 
 func main() {
+	flag.Parse()
+
+	// Считываем переменные окружения
+	log.Printf("confiPath :%s", configPath)
+	err := config.Load(configPath)
+	if err != nil {
+		log.Fatalf("failed to load config: %v", err)
+	}
+
+	log.Println("Loaded Config Parameters")
+
+	grpcConfig, err := config.NewGRPCConfig()
+	if err != nil {
+		log.Fatalf("failed to get grpc config: %v", err)
+	}
+
+	pgConfig, err := config.NewPGConfig()
+	if err != nil {
+		log.Fatalf("failed to get pg config: %v", err)
+	}
+
 
 	ctx := context.Background()
-	pool, err := pgxpool.Connect(ctx, dbDSN)
+	pool, err := pgxpool.Connect(ctx, pgConfig.DSN())
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 	defer pool.Close()
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	listener, err := net.Listen("tcp", grpcConfig.Address())
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
-
 	}
 
 	s := grpc.NewServer()
