@@ -6,7 +6,7 @@ WORKDIR /github.com/Oleg-Pro/chat-server
 
 
 RUN go mod download
-RUN go build -o ./bin/auth_server cmd/grpc_server/main.go
+RUN go build -o ./bin/chat_server cmd/grpc_server/main.go
 
 FROM alpine:latest
 
