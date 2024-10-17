@@ -15,4 +15,4 @@ COPY --from=builder /github.com/Oleg-Pro/chat-server/bin/chat_server .
 
 ADD .env .
 
-CMD ["./auth_server"]
+CMD ["./chat_server"]
