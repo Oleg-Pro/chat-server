@@ -24,7 +24,9 @@ func init() {
 }
 
 const (
-	chatsTable = "chats"
+	chatsTable       = "chats"
+	chatsColumnID    = "id"
+	chatsColumnUsers = "users"
 )
 
 type server struct {
@@ -33,20 +35,18 @@ type server struct {
 }
 
 func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
-	log.Printf("Create req: %+v", req)
-
 	if len(req.GetUserNames()) == 0 {
 		err := fmt.Errorf("users list should not be empty")
 		log.Printf("Create Chat Error: %v", err)
 
-		return &desc.CreateResponse{}, err
+		return nil, err
 	}
 
 	users := string(strings.Join(req.GetUserNames(), ","))
 
 	builderInsert := sq.Insert(chatsTable).
 		PlaceholderFormat(sq.Dollar).
-		Columns("users").
+		Columns(chatsColumnUsers).
 		Values(users).
 		Suffix("RETURNING id")
 
@@ -54,7 +54,7 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 	if err != nil {
 		log.Printf("Failed to build insert query: %v", err)
 
-		return &desc.CreateResponse{}, err
+		return nil, err
 	}
 
 	var chatID int64
@@ -63,7 +63,7 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 
 	if err != nil {
 		log.Printf("Failed to create chat: %v", err)
-		return &desc.CreateResponse{}, err
+		return nil, err
 	}
 
 	return &desc.CreateResponse{
@@ -72,22 +72,20 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 }
 
 func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*empty.Empty, error) {
-	log.Printf("Delete req: %+v", req)
-
 	builderDelete := sq.Delete(chatsTable).
 		PlaceholderFormat(sq.Dollar).
-		Where(sq.Eq{"id": req.GetId()})
+		Where(sq.Eq{fmt.Sprintf(`"%s"`, chatsColumnID): req.GetId()})
 
 	query, args, err := builderDelete.ToSql()
 	if err != nil {
 		log.Printf("Failed to build delete query: %v", err)
-		return &empty.Empty{}, err
+		return nil, err
 	}
 
 	res, err := s.pool.Exec(ctx, query, args...)
 	if err != nil {
 		log.Printf("Failed to delete user with id %d: %v", req.GetId(), err)
-		return &empty.Empty{}, err
+		return nil, err
 	}
 
 	log.Printf("delete %d rows", res.RowsAffected())
@@ -97,7 +95,6 @@ func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*empty.Em
 
 func (s *server) SendMessage(_ context.Context, req *desc.SendMessageRequest) (*empty.Empty, error) {
 	log.Printf("Send req: %+v", req)
-
 	return &empty.Empty{}, nil
 }
 
