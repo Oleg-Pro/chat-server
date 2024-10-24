@@ -1,5 +1,9 @@
 package model
 
+import (
+	"database/sql"
+)
+
 // ChatInfo info about chat
 type ChatInfo struct {
 	Users string
@@ -9,4 +13,10 @@ type ChatInfo struct {
 type Chat struct {
 	ID   int64
 	Info ChatInfo
+}
+
+type MessageInfo struct {
+	From      string
+	Text      string
+	Timestamp sql.NullTime
 }
