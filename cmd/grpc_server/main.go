@@ -2,20 +2,16 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"flag"
-	"fmt"
 	"log"
 	"net"
-	"strings"
 
+	chatAPI "github.com/Oleg-Pro/chat-server/internal/api/chat"
 	"github.com/Oleg-Pro/chat-server/internal/config"
-	"github.com/Oleg-Pro/chat-server/internal/model"
 	"github.com/Oleg-Pro/chat-server/internal/repository/chat"
-	"github.com/Oleg-Pro/chat-server/internal/service"
+
 	chatService "github.com/Oleg-Pro/chat-server/internal/service/chat"
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
-	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -25,68 +21,6 @@ var configPath string
 
 func init() {
 	flag.StringVar(&configPath, "config-path", ".env", "path to config file")
-}
-
-type server struct {
-	desc.UnimplementedChatV1Server
-	chatService service.ChatService
-}
-
-func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
-	if len(req.GetUserNames()) == 0 {
-		err := fmt.Errorf("users list should not be empty")
-		log.Printf("Create Chat Error: %v", err)
-
-		return nil, err
-	}
-
-	users := string(strings.Join(req.GetUserNames(), ","))
-
-	chatID, err := s.chatService.Create(ctx, &model.ChatInfo{Users: users})
-	if err != nil {
-		log.Printf("Failed to create chat: %v", err)
-		return nil, err
-	}
-
-	return &desc.CreateResponse{
-		Id: chatID,
-	}, nil
-}
-
-func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*empty.Empty, error) {
-	_, err := s.chatService.Delete(ctx, req.GetId())
-	if err != nil {
-		log.Printf("Failed to delete user with id %d: %v", req.GetId(), err)
-		return nil, err
-	}
-
-	return &empty.Empty{}, nil
-
-}
-
-func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*empty.Empty, error) {
-	log.Printf("Send req: %+v", req)
-
-	var timestamp sql.NullTime
-	if req.GetTimestamp() == nil {
-		timestamp.Valid = false
-
-	} else {
-		timestamp.Time = req.GetTimestamp().AsTime()
-	}
-
-	err := s.chatService.SendMessage(ctx, &model.MessageInfo{
-		From:      req.GetFrom(),
-		Text:      req.GetText(),
-		Timestamp: timestamp,
-	})
-
-	if err != nil {
-		log.Printf("Failed to send message: %s", err.Error())
-		return nil, err
-	}
-
-	return &empty.Empty{}, nil
 }
 
 func main() {
@@ -129,7 +63,8 @@ func main() {
 	chatRepository := chat.NewRepository(pool)
 	chatService := chatService.New(chatRepository)
 
-	desc.RegisterChatV1Server(s, &server{chatService: chatService})
+	desc.RegisterChatV1Server(s, chatAPI.NewImplementation(chatService))
+
 	log.Printf("Server listening at %v", listener.Addr())
 
 	if err = s.Serve(listener); err != nil {
