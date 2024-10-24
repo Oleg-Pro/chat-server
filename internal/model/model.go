@@ -1,14 +1,12 @@
 package model
 
-const ChatUsersSeperator = ","
-
 // ChatInfo info about chat
 type ChatInfo struct {
-	Users        string
+	Users string
 }
 
 // Chat entity
 type Chat struct {
-	ID        int64
-	Info      ChatInfo
+	ID   int64
+	Info ChatInfo
 }

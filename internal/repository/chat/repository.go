@@ -4,18 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
-//	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v4/pgxpool"
-
-	/*	"github.com/Oleg-Pro/auth/internal/client/db"
-		"github.com/Oleg-Pro/auth/internal/model"
-		"github.com/Oleg-Pro/auth/internal/repository"
-		"github.com/Oleg-Pro/auth/internal/repository/user/converter"
-		modelRepo "github.com/Oleg-Pro/auth/internal/repository/user/model"*/
 	"github.com/Oleg-Pro/chat-server/internal/model"
 	"github.com/Oleg-Pro/chat-server/internal/repository"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 const (
@@ -26,8 +19,7 @@ const (
 )
 
 type repo struct {
-	pool  *pgxpool.Pool
-
+	pool *pgxpool.Pool
 }
 
 // NewRepository create UserRepository
@@ -40,7 +32,7 @@ func (r *repo) Create(ctx context.Context, info *model.ChatInfo) (int64, error) 
 	builderInsert := sq.Insert(chatTable).
 		PlaceholderFormat(sq.Dollar).
 		Columns(chatColumnUsers).
-		Values(info.Users,).
+		Values(info.Users).
 		Suffix("RETURNING id")
 
 	query, args, err := builderInsert.ToSql()
@@ -59,7 +51,6 @@ func (r *repo) Create(ctx context.Context, info *model.ChatInfo) (int64, error) 
 
 	return userID, nil
 }
-
 
 func (r *repo) Delete(ctx context.Context, id int64) (int64, error) {
 
