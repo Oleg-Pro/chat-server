@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"log"
 	"net"
 	"strings"
-	"database/sql"
+
 	"github.com/Oleg-Pro/chat-server/internal/config"
 	"github.com/Oleg-Pro/chat-server/internal/model"
 	"github.com/Oleg-Pro/chat-server/internal/repository/chat"
@@ -28,7 +29,7 @@ func init() {
 
 type server struct {
 	desc.UnimplementedChatV1Server
-	chatService    service.ChatService
+	chatService service.ChatService
 }
 
 func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
@@ -67,19 +68,17 @@ func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) 
 	log.Printf("Send req: %+v", req)
 
 	var timestamp sql.NullTime
-	if (req.GetTimestamp() == nil) {
+	if req.GetTimestamp() == nil {
 		timestamp.Valid = false
 
 	} else {
 		timestamp.Time = req.GetTimestamp().AsTime()
 	}
 
-
 	err := s.chatService.SendMessage(ctx, &model.MessageInfo{
-		From: req.GetFrom(),
-		Text: req.GetText(),
+		From:      req.GetFrom(),
+		Text:      req.GetText(),
 		Timestamp: timestamp,
-
 	})
 
 	if err != nil {

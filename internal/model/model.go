@@ -15,6 +15,7 @@ type Chat struct {
 	Info ChatInfo
 }
 
+// MessageInfo info to send message
 type MessageInfo struct {
 	From      string
 	Text      string
