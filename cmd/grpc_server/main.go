@@ -10,6 +10,9 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/Oleg-Pro/chat-server/internal/config"
+	"github.com/Oleg-Pro/chat-server/internal/model"
+	"github.com/Oleg-Pro/chat-server/internal/repository"
+	"github.com/Oleg-Pro/chat-server/internal/repository/chat"
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -32,6 +35,8 @@ const (
 type server struct {
 	desc.UnimplementedChatV1Server
 	pool *pgxpool.Pool
+	chatRepository repository.ChatRepository
+
 }
 
 func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
@@ -44,7 +49,9 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 
 	users := string(strings.Join(req.GetUserNames(), ","))
 
-	builderInsert := sq.Insert(chatsTable).
+
+
+	/*builderInsert := sq.Insert(chatsTable).
 		PlaceholderFormat(sq.Dollar).
 		Columns(chatsColumnUsers).
 		Values(users).
@@ -64,7 +71,14 @@ func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.Cre
 	if err != nil {
 		log.Printf("Failed to create chat: %v", err)
 		return nil, err
+	}*/
+
+	chatID, err := s.chatRepository.Create(ctx, &model.ChatInfo{Users: users})
+	if err != nil {
+		log.Printf("Failed to create chat: %v", err)
+		return nil, err		
 	}
+	
 
 	return &desc.CreateResponse{
 		Id: chatID,
@@ -135,7 +149,10 @@ func main() {
 	s := grpc.NewServer()
 	reflection.Register(s)
 
-	desc.RegisterChatV1Server(s, &server{pool: pool})
+
+	chatRepository := chat.NewRepository(pool)	
+
+	desc.RegisterChatV1Server(s, &server{pool: pool, chatRepository: chatRepository})
 	log.Printf("Server listening at %v", listener.Addr())
 
 	if err = s.Serve(listener); err != nil {
