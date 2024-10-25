@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"flag"
+//	"flag"
 	"log"
-	"net"
+//	"net"
 
-	chatAPI "github.com/Oleg-Pro/chat-server/internal/api/chat"
+/*	chatAPI "github.com/Oleg-Pro/chat-server/internal/api/chat"
 	"github.com/Oleg-Pro/chat-server/internal/config"
 	"github.com/Oleg-Pro/chat-server/internal/repository/chat"
 
@@ -14,17 +14,30 @@ import (
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/reflection"*/
+	"github.com/Oleg-Pro/chat-server/internal/app"	
 )
 
-var configPath string
+/*var configPath string
 
 func init() {
 	flag.StringVar(&configPath, "config-path", ".env", "path to config file")
-}
+}*/
 
 func main() {
-	flag.Parse()
+
+	ctx := context.Background()
+	a, err := app.NewApp(ctx)
+	if err != nil {
+		log.Fatalf("failed to init app: %s", err.Error())
+	}
+
+	err = a.Run()
+	if err != nil {
+		log.Fatalf("failed to run app: %s", err.Error())
+	}
+
+/*	flag.Parse()
 
 	// Считываем переменные окружения
 	log.Printf("confiPath :%s", configPath)
@@ -69,5 +82,5 @@ func main() {
 
 	if err = s.Serve(listener); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
-	}
+	}*/
 }
