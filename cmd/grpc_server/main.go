@@ -2,20 +2,20 @@ package main
 
 import (
 	"context"
-//	"flag"
+	//	"flag"
 	"log"
-//	"net"
+	//	"net"
 
-/*	chatAPI "github.com/Oleg-Pro/chat-server/internal/api/chat"
-	"github.com/Oleg-Pro/chat-server/internal/config"
-	"github.com/Oleg-Pro/chat-server/internal/repository/chat"
+	/*	chatAPI "github.com/Oleg-Pro/chat-server/internal/api/chat"
+		"github.com/Oleg-Pro/chat-server/internal/config"
+		"github.com/Oleg-Pro/chat-server/internal/repository/chat"
 
-	chatService "github.com/Oleg-Pro/chat-server/internal/service/chat"
-	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
-	"github.com/jackc/pgx/v4/pgxpool"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"*/
-	"github.com/Oleg-Pro/chat-server/internal/app"	
+		chatService "github.com/Oleg-Pro/chat-server/internal/service/chat"
+		desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
+		"github.com/jackc/pgx/v4/pgxpool"
+		"google.golang.org/grpc"
+		"google.golang.org/grpc/reflection"*/
+	"github.com/Oleg-Pro/chat-server/internal/app"
 )
 
 /*var configPath string
@@ -37,50 +37,58 @@ func main() {
 		log.Fatalf("failed to run app: %s", err.Error())
 	}
 
-/*	flag.Parse()
+	/*
+	   flag.Parse()
 
-	// Считываем переменные окружения
-	log.Printf("confiPath :%s", configPath)
-	err := config.Load(configPath)
-	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
-	}
+	   // Считываем переменные окружения
+	   log.Printf("confiPath :%s", configPath)
+	   err := config.Load(configPath)
 
-	log.Println("Loaded Config Parameters")
+	   	if err != nil {
+	   		log.Fatalf("failed to load config: %v", err)
+	   	}
 
-	grpcConfig, err := config.NewGRPCConfig()
-	if err != nil {
-		log.Fatalf("failed to get grpc config: %v", err)
-	}
+	   log.Println("Loaded Config Parameters")
 
-	pgConfig, err := config.NewPGConfig()
-	if err != nil {
-		log.Fatalf("failed to get pg config: %v", err)
-	}
+	   grpcConfig, err := config.NewGRPCConfig()
 
-	ctx := context.Background()
-	pool, err := pgxpool.Connect(ctx, pgConfig.DSN())
-	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
-	}
-	defer pool.Close()
+	   	if err != nil {
+	   		log.Fatalf("failed to get grpc config: %v", err)
+	   	}
 
-	listener, err := net.Listen("tcp", grpcConfig.Address())
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
-	}
+	   pgConfig, err := config.NewPGConfig()
 
-	s := grpc.NewServer()
-	reflection.Register(s)
+	   	if err != nil {
+	   		log.Fatalf("failed to get pg config: %v", err)
+	   	}
 
-	chatRepository := chat.NewRepository(pool)
-	chatService := chatService.New(chatRepository)
+	   ctx := context.Background()
+	   pool, err := pgxpool.Connect(ctx, pgConfig.DSN())
 
-	desc.RegisterChatV1Server(s, chatAPI.NewImplementation(chatService))
+	   	if err != nil {
+	   		log.Fatalf("failed to connect to database: %v", err)
+	   	}
 
-	log.Printf("Server listening at %v", listener.Addr())
+	   defer pool.Close()
 
-	if err = s.Serve(listener); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
-	}*/
+	   listener, err := net.Listen("tcp", grpcConfig.Address())
+
+	   	if err != nil {
+	   		log.Fatalf("Failed to listen: %v", err)
+	   	}
+
+	   s := grpc.NewServer()
+	   reflection.Register(s)
+
+	   chatRepository := chat.NewRepository(pool)
+	   chatService := chatService.New(chatRepository)
+
+	   desc.RegisterChatV1Server(s, chatAPI.NewImplementation(chatService))
+
+	   log.Printf("Server listening at %v", listener.Addr())
+
+	   	if err = s.Serve(listener); err != nil {
+	   		log.Fatalf("Failed to serve: %v", err)
+	   	}
+	*/
 }

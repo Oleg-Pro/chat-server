@@ -8,8 +8,9 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/Oleg-Pro/chat-server/internal/model"
 	"github.com/Oleg-Pro/chat-server/internal/repository"
-//	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/Oleg-Pro/chat-server/internal/client/db"	
+
+	//	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/Oleg-Pro/chat-server/internal/client/db"
 )
 
 const (
@@ -20,8 +21,8 @@ const (
 )
 
 type repo struct {
-//	pool *pgxpool.Pool
-	db db.Client	
+	//	pool *pgxpool.Pool
+	db db.Client
 }
 
 // NewRepository create ChatRepository
@@ -76,8 +77,7 @@ func (r *repo) Delete(ctx context.Context, id int64) (int64, error) {
 		QueryRaw: query,
 	}
 
-
-	res, err := r.db.DB().ExecContext(ctx, q, args...)	
+	res, err := r.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
 		log.Printf("Failed to delete chat with id %d: %v", id, err)
 		return 0, err
