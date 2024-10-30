@@ -34,6 +34,12 @@ func TestCreate(t *testing.T) {
 			UserNames: userNames,
 		}
 
+		emptyUserNames = []string{}		
+		reqWithEmptyUserNames = &desc.CreateRequest{
+			UserNames: emptyUserNames,
+		}
+
+
 		chatInfo = &model.ChatInfo{
 			Users: "user1,user2,user3",
 		}
@@ -67,6 +73,20 @@ func TestCreate(t *testing.T) {
 				return mock
 			},
 		},
+		{
+			name: "empty user list",
+			args: args{
+				ctx: ctx,
+				req: reqWithEmptyUserNames,
+			},
+			want: nil,
+			err:  chatAPI.ErrUserListEmpty,
+			chatServiceMock: func(mc *minimock.Controller) service.ChatService {
+				mock := serviceMocks.NewChatServiceMock(mc)
+				return mock
+			},
+		},
+
 	}
 
 	for _, tt := range tests {
