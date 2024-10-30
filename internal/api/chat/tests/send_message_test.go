@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	chatAPI "github.com/Oleg-Pro/chat-server/internal/api/chat"
@@ -11,44 +12,50 @@ import (
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/gojuno/minimock/v3"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func TestCreate(t *testing.T) {
+func TestSendMessage(t *testing.T) {
 	t.Parallel()
 	type chatServiceMockFunc func(mc *minimock.Controller) service.ChatService
 
 	type args struct {
 		ctx context.Context
-		req *desc.CreateRequest
+		req *desc.SendMessageRequest
 	}
 
 	var (
 		ctx = context.Background()
 		mc  = minimock.NewController(t)
 
-		id        = gofakeit.Int64()
-		userNames = []string{"user1", "user2", "user3"}
+		from        = gofakeit.Name()
+		text        = "Text message"
+		timestamppb = timestamppb.Now()
 
-		req = &desc.CreateRequest{
-			UserNames: userNames,
+		req = &desc.SendMessageRequest{
+			From:      from,
+			Text:      text,
+			Timestamp: timestamppb,
 		}
 
-		chatInfo = &model.ChatInfo{
-			Users: "user1,user2,user3",
-		}
-
-		res = &desc.CreateResponse{
-			Id: id,
-		}
+		res = &empty.Empty{}
 	)
 
 	defer t.Cleanup(mc.Finish)
 
+	var timestamp sql.NullTime
+	if timestamppb == nil {
+		timestamp.Valid = false
+	} else {
+		timestamp.Time = timestamppb.AsTime()
+	}
+
 	tests := []struct {
 		name            string
 		args            args
-		want            *desc.CreateResponse
+		want            *empty.Empty
 		err             error
 		chatServiceMock chatServiceMockFunc
 	}{
@@ -62,8 +69,11 @@ func TestCreate(t *testing.T) {
 			err:  nil,
 			chatServiceMock: func(mc *minimock.Controller) service.ChatService {
 				mock := serviceMocks.NewChatServiceMock(mc)
-
-				mock.CreateMock.Expect(ctx, chatInfo).Return(id, nil)
+				mock.SendMessageMock.Expect(ctx, &model.MessageInfo{
+					From:      from,
+					Text:      text,
+					Timestamp: timestamp,
+				}).Return(nil)
 				return mock
 			},
 		},
@@ -75,7 +85,7 @@ func TestCreate(t *testing.T) {
 			t.Parallel()
 			chatServiceMock := tt.chatServiceMock(mc)
 			api := chatAPI.NewImplementation(chatServiceMock)
-			resonse, err := api.Create(tt.args.ctx, tt.args.req)
+			resonse, err := api.SendMessage(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)
 			require.Equal(t, tt.want, resonse)
 		})

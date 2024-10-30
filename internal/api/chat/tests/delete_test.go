@@ -27,13 +27,12 @@ func TestDelete(t *testing.T) {
 		ctx = context.Background()
 		mc  = minimock.NewController(t)
 
-		id              = gofakeit.Int64()
+		id           = gofakeit.Int64()
 		numberOfRows = int64(1)
-		req = &desc.DeleteRequest{		
+		req          = &desc.DeleteRequest{
 			Id: id,
-		}		
-		res = &empty.Empty{
 		}
+		res = &empty.Empty{}
 	)
 
 	defer t.Cleanup(mc.Finish)

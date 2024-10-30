@@ -2,8 +2,11 @@ package tests
 
 import (
 	"context"
+	"database/sql"
 	"testing"
+	"time"
 
+	"github.com/Oleg-Pro/chat-server/internal/model"
 	"github.com/Oleg-Pro/chat-server/internal/repository"
 	repoMocks "github.com/Oleg-Pro/chat-server/internal/repository/mocks"
 	"github.com/Oleg-Pro/chat-server/internal/service/chat"
@@ -12,21 +15,29 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDelete(t *testing.T) {
+func TestMessage(t *testing.T) {
 	t.Parallel()
 	type userRepositoryMockFunc func(mc *minimock.Controller) repository.ChatRepository
 
 	type args struct {
 		ctx context.Context
-		id  int64
+		req *model.MessageInfo
 	}
 
 	var (
 		ctx = context.Background()
 		mc  = minimock.NewController(t)
 
-		id           = gofakeit.Int64()
-		numberOfRows = int64(1)
+		from = gofakeit.Name()
+		text = "Text message"
+
+		timestamp = sql.NullTime{Time: time.Now(), Valid: true}
+
+		req = &model.MessageInfo{
+			From:      from,
+			Text:      text,
+			Timestamp: timestamp,
+		}
 	)
 
 	defer t.Cleanup(mc.Finish)
@@ -42,13 +53,11 @@ func TestDelete(t *testing.T) {
 			name: "success case",
 			args: args{
 				ctx: ctx,
-				id:  id,
+				req: req,
 			},
-			want: numberOfRows,
-			err:  nil,
+			err: nil,
 			userRepositoryMock: func(mc *minimock.Controller) repository.ChatRepository {
 				mock := repoMocks.NewChatRepositoryMock(mc)
-				mock.DeleteMock.Expect(ctx, id).Return(numberOfRows, nil)
 				return mock
 			},
 		},
@@ -60,9 +69,8 @@ func TestDelete(t *testing.T) {
 			t.Parallel()
 			userRepoMock := tt.userRepositoryMock(mc)
 			api := chat.New(userRepoMock)
-			resonse, err := api.Delete(tt.args.ctx, tt.args.id)
+			err := api.SendMessage(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)
-			require.Equal(t, tt.want, resonse)
 		})
 	}
 }
