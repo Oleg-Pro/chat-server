@@ -26,11 +26,10 @@ func TestCreate(t *testing.T) {
 		ctx = context.Background()
 		mc  = minimock.NewController(t)
 
-		id           = gofakeit.Int64()
+		id  = gofakeit.Int64()
 		req = &model.ChatInfo{
 			Users: "user1,user2,user3",
 		}
-
 	)
 
 	defer t.Cleanup(mc.Finish)
