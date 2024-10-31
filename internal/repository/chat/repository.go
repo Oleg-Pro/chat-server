@@ -8,9 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/Oleg-Pro/chat-server/internal/model"
 	"github.com/Oleg-Pro/chat-server/internal/repository"
-
-	//	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/Oleg-Pro/chat-server/internal/client/db"
+	"github.com/Oleg-Pro/platform-common/pkg/db"
 )
 
 const (

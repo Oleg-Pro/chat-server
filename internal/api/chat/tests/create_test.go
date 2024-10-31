@@ -34,11 +34,10 @@ func TestCreate(t *testing.T) {
 			UserNames: userNames,
 		}
 
-		emptyUserNames = []string{}		
+		emptyUserNames        = []string{}
 		reqWithEmptyUserNames = &desc.CreateRequest{
 			UserNames: emptyUserNames,
 		}
-
 
 		chatInfo = &model.ChatInfo{
 			Users: "user1,user2,user3",
@@ -86,7 +85,6 @@ func TestCreate(t *testing.T) {
 				return mock
 			},
 		},
-
 	}
 
 	for _, tt := range tests {
