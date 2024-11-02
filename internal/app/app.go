@@ -6,9 +6,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/Oleg-Pro/chat-server/internal/closer"
 	"github.com/Oleg-Pro/chat-server/internal/config"
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
+	"github.com/Oleg-Pro/platform-common/pkg/closer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"

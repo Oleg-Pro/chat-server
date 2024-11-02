@@ -5,15 +5,15 @@ import (
 	"log"
 
 	chatAPI "github.com/Oleg-Pro/chat-server/internal/api/chat"
-	"github.com/Oleg-Pro/chat-server/internal/client/db"
-	"github.com/Oleg-Pro/chat-server/internal/client/db/pg"
-	"github.com/Oleg-Pro/chat-server/internal/client/db/transaction"
-	"github.com/Oleg-Pro/chat-server/internal/closer"
 	"github.com/Oleg-Pro/chat-server/internal/config"
 	"github.com/Oleg-Pro/chat-server/internal/repository"
 	chatRepository "github.com/Oleg-Pro/chat-server/internal/repository/chat"
 	"github.com/Oleg-Pro/chat-server/internal/service"
 	chatService "github.com/Oleg-Pro/chat-server/internal/service/chat"
+	"github.com/Oleg-Pro/platform-common/pkg/closer"
+	"github.com/Oleg-Pro/platform-common/pkg/db"
+	"github.com/Oleg-Pro/platform-common/pkg/db/pg"
+	"github.com/Oleg-Pro/platform-common/pkg/db/transaction"
 )
 
 type serviceProvider struct {

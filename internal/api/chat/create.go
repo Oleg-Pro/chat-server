@@ -2,7 +2,7 @@ package chat
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log"
 	"strings"
 
@@ -10,13 +10,13 @@ import (
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
 )
 
+// ErrUserListEmpty error password are not equal
+var ErrUserListEmpty = errors.New("passwords are not equal")
+
 // Create implementation of Create User Api Method
 func (i *Implementation) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
 	if len(req.GetUserNames()) == 0 {
-		err := fmt.Errorf("users list should not be empty")
-		log.Printf("Create Chat Error: %v", err)
-
-		return nil, err
+		return nil, ErrUserListEmpty
 	}
 
 	users := string(strings.Join(req.GetUserNames(), ","))
