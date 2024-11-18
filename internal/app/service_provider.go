@@ -6,6 +6,7 @@ import (
 
 	chatAPI "github.com/Oleg-Pro/chat-server/internal/api/chat"
 	"github.com/Oleg-Pro/chat-server/internal/config"
+	"github.com/Oleg-Pro/chat-server/internal/interceptor"
 	"github.com/Oleg-Pro/chat-server/internal/repository"
 	chatRepository "github.com/Oleg-Pro/chat-server/internal/repository/chat"
 	"github.com/Oleg-Pro/chat-server/internal/service"
@@ -26,6 +27,8 @@ type serviceProvider struct {
 
 	chatService       service.ChatService
 	chatImplemenation *chatAPI.Implementation
+
+	authInterceptor *interceptor.AuthInterceptor
 }
 
 func newServiceProvider() *serviceProvider {
@@ -106,4 +109,12 @@ func (s *serviceProvider) ChatImplementation(ctx context.Context) *chatAPI.Imple
 		s.chatImplemenation = chatAPI.NewImplementation(s.ChatService(ctx))
 	}
 	return s.chatImplemenation
+}
+
+func (s *serviceProvider) AuthInterceptor(_ context.Context) *interceptor.AuthInterceptor {
+	if s.authInterceptor == nil {
+		s.authInterceptor = interceptor.NewAuthInterceptor()
+	}
+
+	return s.authInterceptor
 }
