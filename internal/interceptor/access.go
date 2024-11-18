@@ -18,8 +18,13 @@ const (
 	authPort   = 50051
 )
 
+// AuthInterceptor auth interceptor struct
+type AuthInterceptor struct {
+	AccessV1Client accessDesc.AccessV1Client
+}
+
 // AcccessInterceptor access interceptor
-func AcccessInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (authInterceptor AuthInterceptor) AcccessInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	log.Printf("Incerceptor FullMethod : %s\n", info.FullMethod)
 
 	md, ok := metadata.FromIncomingContext(ctx)
@@ -42,20 +47,9 @@ func AcccessInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySe
 	log.Printf("AccesToken : %#v\n", accessToken)
 
 	clientCtx := context.Background()
-	//	md := metadata.New(map[string]string{"Authorization": "Bearer " + accessToken})
 	clientCtx = metadata.NewOutgoingContext(clientCtx, md)
 
-	conn, err := grpc.Dial(
-		fmt.Sprintf(":%d", authPort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	cl := accessDesc.NewAccessV1Client(conn)
-
-	_, err = cl.Check(clientCtx, &accessDesc.CheckRequest{
+	_, err := authInterceptor.AccessV1Client.Check(clientCtx, &accessDesc.CheckRequest{
 		EndpointAddress: info.FullMethod,
 	})
 	if err != nil {
@@ -63,4 +57,21 @@ func AcccessInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySe
 	}
 
 	return handler(ctx, req)
+}
+
+// NewAuthInterceptor AuthInterceptor constructor
+func NewAuthInterceptor() *AuthInterceptor {
+
+	conn, err := grpc.Dial(
+		fmt.Sprintf(":%d", authPort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+
+	if err != nil {
+		log.Fatalf("Error create grpc connect to auth: %s", err.Error())
+	}
+
+	cl := accessDesc.NewAccessV1Client(conn)
+
+	return &AuthInterceptor{AccessV1Client: cl}
 }
