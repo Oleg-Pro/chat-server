@@ -4,11 +4,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/Oleg-Pro/chat-server/internal/logger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"github.com/Oleg-Pro/chat-server/internal/logger"
 )
 
+// LogInterceptor logger interceptor
 func LogInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	now := time.Now()
 

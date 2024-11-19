@@ -27,14 +27,14 @@ type App struct {
 	serviceProvider *serviceProvider
 	grpcServer      *grpc.Server
 	configPath      string
-	logLevel string
+	logLevel        string
 }
 
 // NewApp creats App
 func NewApp(ctx context.Context) (*App, error) {
 	a := &App{}
 	flag.StringVar(&a.configPath, "config-path", ".env", "path to config file")
-	a.logLevel = *flag.String("l", "info", "log level")		
+	a.logLevel = *flag.String("l", "info", "log level")
 	flag.Parse()
 
 	logger.Init(a.getCore(a.getAtomicLevel()))
@@ -95,22 +95,18 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 		grpc.Creds(insecure.NewCredentials()),
 		grpc.UnaryInterceptor(
 			grpcMiddleware.ChainUnaryServer(
-				interceptor.LogInterceptor,				
-				a.serviceProvider.AuthInterceptor(ctx).AcccessInterceptor,				
+				interceptor.LogInterceptor,
+				a.serviceProvider.AuthInterceptor(ctx).AcccessInterceptor,
 			),
 		),
 	)
 
-/*	grpcMiddleware.ChainUnaryServer(
+	/*	grpcMiddleware.ChainUnaryServer(
 		interceptor.LogInterceptor,
 		interceptor.ValidateInterceptor,
 		),		*/
 
-
-//	grpcMiddleware.ChainUnaryServer(interceptor.LogInterceptor,)
-
-
-
+	//	grpcMiddleware.ChainUnaryServer(interceptor.LogInterceptor,)
 
 	reflection.Register(a.grpcServer)
 	desc.RegisterChatV1Server(a.grpcServer, a.serviceProvider.ChatImplementation(ctx))
@@ -120,7 +116,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 func (a *App) runGRPCServer() error {
 	log.Printf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address())
-	logger.Info(fmt.Sprintf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address()))	
+	logger.Info(fmt.Sprintf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address()))
 	listener, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Address())
 
 	if err != nil {
@@ -140,7 +136,7 @@ func (a *App) getCore(level zap.AtomicLevel) zapcore.Core {
 
 	file := zapcore.AddSync(&lumberjack.Logger{
 		Filename:   "logs/app.log",
-		MaxSize:    10, // megabytes		
+		MaxSize:    10, // megabytes
 		MaxBackups: 3,
 		MaxAge:     7, // days
 	})
@@ -150,7 +146,7 @@ func (a *App) getCore(level zap.AtomicLevel) zapcore.Core {
 	productionCfg.EncodeTime = zapcore.ISO8601TimeEncoder
 
 	developmentCfg := zap.NewDevelopmentEncoderConfig()
-	developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder	
+	developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
 
 	consoleEncoder := zapcore.NewConsoleEncoder(developmentCfg)
 	fileEncoder := zapcore.NewJSONEncoder(productionCfg)
@@ -164,7 +160,7 @@ func (a *App) getCore(level zap.AtomicLevel) zapcore.Core {
 func (a *App) getAtomicLevel() zap.AtomicLevel {
 	var level zapcore.Level
 	if err := level.Set(a.logLevel); err != nil {
-		log.Fatalf("failed to set log level: %v", err)		
+		log.Fatalf("failed to set log level: %v", err)
 	}
 
 	return zap.NewAtomicLevelAt(level)
