@@ -3,7 +3,6 @@ package chat
 import (
 	"context"
 	"errors"
-	"log"
 	"strings"
 
 	"github.com/Oleg-Pro/chat-server/internal/model"
@@ -23,7 +22,6 @@ func (i *Implementation) Create(ctx context.Context, req *desc.CreateRequest) (*
 
 	chatID, err := i.chatService.Create(ctx, &model.ChatInfo{Users: users})
 	if err != nil {
-		log.Printf("Failed to create chat: %v", err)
 		return nil, err
 	}
 

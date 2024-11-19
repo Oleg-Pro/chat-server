@@ -101,13 +101,6 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 		),
 	)
 
-	/*	grpcMiddleware.ChainUnaryServer(
-		interceptor.LogInterceptor,
-		interceptor.ValidateInterceptor,
-		),		*/
-
-	//	grpcMiddleware.ChainUnaryServer(interceptor.LogInterceptor,)
-
 	reflection.Register(a.grpcServer)
 	desc.RegisterChatV1Server(a.grpcServer, a.serviceProvider.ChatImplementation(ctx))
 
@@ -115,7 +108,6 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 }
 
 func (a *App) runGRPCServer() error {
-	log.Printf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address())
 	logger.Info(fmt.Sprintf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address()))
 	listener, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Address())
 
