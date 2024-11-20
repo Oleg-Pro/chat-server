@@ -19,8 +19,8 @@ import (
 
 type serviceProvider struct {
 	pgConfig               config.PGConfig
-	grpcConfig             config.GRPCConfig
 	prometheusServerConfig config.PrometheusServerConfig
+	grpcConfig             config.GRPCConfig
 
 	dbClient       db.Client
 	txManager      db.TxManager
