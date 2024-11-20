@@ -20,6 +20,7 @@ import (
 type serviceProvider struct {
 	pgConfig   config.PGConfig
 	grpcConfig config.GRPCConfig
+	prometheusServerConfig config.PrometheusServerConfig
 
 	dbClient       db.Client
 	txManager      db.TxManager
@@ -52,13 +53,26 @@ func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 	if s.grpcConfig == nil {
 		cfg, err := config.NewGRPCConfig()
 		if err != nil {
-			log.Fatalf("failed to get pg config: %s", err.Error())
+			log.Fatalf("failed to get grpc config: %s", err.Error())
 		}
 
 		s.grpcConfig = cfg
 	}
 
 	return s.grpcConfig
+}
+
+func (s *serviceProvider) PrometheusServerConfig() config.PrometheusServerConfig {
+	if s.prometheusServerConfig == nil {
+		cfg, err := config.NewPrometheusServerConfig()
+		if err != nil {
+			log.Fatalf("failed to get prometheus server config: %s", err.Error())
+		}
+
+		s.prometheusServerConfig = cfg
+	}
+
+	return s.prometheusServerConfig
 }
 
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
