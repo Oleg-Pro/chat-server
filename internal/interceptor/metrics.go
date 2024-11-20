@@ -2,20 +2,27 @@ package interceptor
 
 import (
 	"context"
-	//	"time"
+	"time"
+
 	"github.com/Oleg-Pro/chat-server/internal/metric"
 	"google.golang.org/grpc"
 )
 
 // MetricsInterceptor metrics interceptor
-func MetricsInterceptor(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func MetricsInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	metric.IncRequestCounter()
 
-	//	timeStart := time.Now()
+	timeStart := time.Now()
 	res, err := handler(ctx, req)
-	/*if err != nil {
-		logger.Error(error.Error())
-	}*/
+	diffTime := time.Since(timeStart)
+
+	if err != nil {
+		metric.IncResponseCounter("error", info.FullMethod)
+		metric.HistogramResponseTimeObserve("error", diffTime.Seconds())
+	} else {
+		metric.IncResponseCounter("success", info.FullMethod)
+		metric.HistogramResponseTimeObserve("success", diffTime.Seconds())
+	}
 
 	return res, err
 

@@ -18,8 +18,8 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig   config.PGConfig
-	grpcConfig config.GRPCConfig
+	pgConfig               config.PGConfig
+	grpcConfig             config.GRPCConfig
 	prometheusServerConfig config.PrometheusServerConfig
 
 	dbClient       db.Client
