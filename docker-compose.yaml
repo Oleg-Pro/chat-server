@@ -2,6 +2,8 @@ version: '3'
 
 volumes:
   chat_server_postgres_volume:  
+  prometheus_data:
+  grafana_data:  
 
 services:
   pg_chat-server:
@@ -21,4 +23,22 @@ services:
       dockerfile: migration.Dockerfile
     restart: on-failure      
 
+  prometheus:
+    image: prom/prometheus:v2.37.9
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus_data:/prometheus
+    network_mode: host
+#    extra_hosts:
+#    - "host.docker.internal:host-gateway"
 
+
+  grafana:
+    image: grafana/grafana-oss:10.0.3
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana    
