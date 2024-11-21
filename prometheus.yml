@@ -12,6 +12,6 @@ scrape_configs:
 
   - job_name: "app"
     static_configs:
-#      - targets: [ "host.docker.internal:2112" ]
+#      - targets: [ "host.docker.internal:2112" ]  # Этот адрес почему-то не работает
       - targets: [ "localhost:2112" ]      
  

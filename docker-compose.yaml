@@ -31,9 +31,9 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./alerts.yml:/etc/prometheus/alerts.yml
       - prometheus_data:/prometheus
-    network_mode: host
+    network_mode: host  # Добавил, чтобы можно было обращаться к хосту как localhost
 #    extra_hosts:
-#    - "host.docker.internal:host-gateway"
+#    - "host.docker.internal:host-gateway" Не помогает, чтобы заработал host.docker.internal
 
 
   grafana:
