@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
-
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"		
+	"github.com/opentracing/opentracing-go"		
 	accessDesc "github.com/Oleg-Pro/auth/pkg/access_v1"
 	"github.com/Oleg-Pro/chat-server/internal/logger"
 	"github.com/pkg/errors"
@@ -49,6 +50,10 @@ func (authInterceptor AuthInterceptor) AcccessInterceptor(ctx context.Context, r
 	clientCtx := context.Background()
 	clientCtx = metadata.NewOutgoingContext(clientCtx, md)
 
+	span, clientCtx := opentracing.StartSpanFromContext(clientCtx, "authorization")
+
+	defer span.Finish()
+
 	_, err := authInterceptor.AccessV1Client.Check(clientCtx, &accessDesc.CheckRequest{
 		EndpointAddress: info.FullMethod,
 	})
@@ -65,6 +70,7 @@ func NewAuthInterceptor() *AuthInterceptor {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(":%d", authPort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),		
 	)
 
 	if err != nil {

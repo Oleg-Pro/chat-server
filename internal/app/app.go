@@ -10,11 +10,11 @@ import (
 	"os"
 	"sync"
 	"time"
-
 	"github.com/Oleg-Pro/chat-server/internal/config"
 	"github.com/Oleg-Pro/chat-server/internal/interceptor"
-	"github.com/Oleg-Pro/chat-server/internal/logger"
+	"github.com/Oleg-Pro/chat-server/internal/logger"	
 	"github.com/Oleg-Pro/chat-server/internal/metric"
+	"github.com/Oleg-Pro/chat-server/internal/tracing"	
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
 	"github.com/Oleg-Pro/platform-common/pkg/closer"
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -26,6 +26,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
+
+const serviceName = "chat_service"
 
 // App type
 type App struct {
@@ -47,6 +49,8 @@ func NewApp(ctx context.Context) (*App, error) {
 	if err != nil {
 		log.Fatalf("failed to init metrics: %v", err)
 	}
+
+	tracing.Init(logger.Logger(), serviceName)	
 
 	err = a.initDeps(ctx)
 	if err != nil {
@@ -127,6 +131,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 				interceptor.MetricsInterceptor,
 				interceptor.LogInterceptor,
 				a.serviceProvider.AuthInterceptor(ctx).AcccessInterceptor,
+				interceptor.ServerTracingInterceptor,								
 			),
 		),
 	)
