@@ -62,11 +62,24 @@ grpc-load-test:
 		--proto api/chat_v1/chat.proto \
 		--call chat_v1.ChatV1.Delete \
 		--data '{"id": 1}' \
-		-m '{"authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzIxMjI4NzksInVzZXJuYW1lIjoib3BwMjAwNzE5ODBAZ21haWwuY29tIiwicm9sZSI6Ilx1MDAwMiJ9.aZ76pZK6qqPJfLIBvnunDIxs7w80qvAruHofcF6cDAQ"}' \								 
+		-m '{"authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzIxNzA3MjUsInVzZXJuYW1lIjoib3BwMjAwNzE5ODBAZ21haWwuY29tIiwicm9sZSI6Ilx1MDAwMiJ9.Funo1uJfUe0pLV6RA8QAOU5vzYLLsbjvWg6iUE-Pha0"}' \
 		--rps 100 \
-		--total 100 \
+		--total 3000 \
 		--insecure \
 		localhost:50052
+
+
+grpc-error-load-test:
+	$(LOCAL_BIN)/ghz \
+		--proto api/chat_v1/chat.proto \
+		--call chat_v1.ChatV1.Delete \
+		--data '{"id": 1}' \
+		--rps 100 \
+		--total 3000 \
+		--insecure \
+		localhost:50052
+
+
 
 
 
