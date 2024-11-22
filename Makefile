@@ -62,7 +62,7 @@ grpc-load-test:
 		--proto api/chat_v1/chat.proto \
 		--call chat_v1.ChatV1.Delete \
 		--data '{"id": 1}' \
-		-m '{"authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzIxNzA3MjUsInVzZXJuYW1lIjoib3BwMjAwNzE5ODBAZ21haWwuY29tIiwicm9sZSI6Ilx1MDAwMiJ9.Funo1uJfUe0pLV6RA8QAOU5vzYLLsbjvWg6iUE-Pha0"}' \
+		-m '{"authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzIyODU0OTQsInVzZXJuYW1lIjoib3BwMjAwNzE5ODBAZ21haWwuY29tIiwicm9sZSI6Ilx1MDAwMiJ9.yjjz9_UG7Qci5FkwjFm5-DjCY9Q1EsVNdSxeTxLUBhQ"}' \
 		--rps 100 \
 		--total 3000 \
 		--insecure \
