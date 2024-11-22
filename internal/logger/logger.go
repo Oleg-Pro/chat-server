@@ -12,10 +12,10 @@ func Init(core zapcore.Core, options ...zap.Option) {
 	globalLogger = zap.New(core, options...)
 }
 
+// Logger get logger
 func Logger() *zap.Logger {
 	return globalLogger
 }
-
 
 // Debug Debug wrapper
 func Debug(msg string, fields ...zap.Field) {

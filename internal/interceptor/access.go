@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"		
-	"github.com/opentracing/opentracing-go"		
+
 	accessDesc "github.com/Oleg-Pro/auth/pkg/access_v1"
 	"github.com/Oleg-Pro/chat-server/internal/logger"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -70,7 +71,7 @@ func NewAuthInterceptor() *AuthInterceptor {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(":%d", authPort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),		
+		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
 	)
 
 	if err != nil {
