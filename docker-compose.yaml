@@ -41,4 +41,5 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - grafana_data:/var/lib/grafana    
+      - grafana_data:/var/lib/grafana   
+    network_mode: host  # Добавил, чтобы можно было обращаться к хосту как localhost
