@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"strings"
-
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"		
+	"github.com/opentracing/opentracing-go"		
 	accessDesc "github.com/Oleg-Pro/auth/pkg/access_v1"
+	"github.com/Oleg-Pro/chat-server/internal/logger"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -25,14 +27,14 @@ type AuthInterceptor struct {
 
 // AcccessInterceptor access interceptor
 func (authInterceptor AuthInterceptor) AcccessInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	log.Printf("Incerceptor FullMethod : %s\n", info.FullMethod)
+	logger.Info(fmt.Sprintf("Incerceptor FullMethod : %s\n", info.FullMethod))
 
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, errors.New("metadata is not provided")
 	}
 
-	log.Printf("MD : %#v\n", md)
+	logger.Info(fmt.Sprintf("MD : %#v\n", md))
 
 	authHeader, ok := md["authorization"]
 	if !ok || len(authHeader) == 0 {
@@ -44,10 +46,13 @@ func (authInterceptor AuthInterceptor) AcccessInterceptor(ctx context.Context, r
 	}
 
 	accessToken := strings.TrimPrefix(authHeader[0], authPrefix)
-	log.Printf("AccesToken : %#v\n", accessToken)
-
+	logger.Info(fmt.Sprintf("AccesToken : %#v\n", accessToken))
 	clientCtx := context.Background()
 	clientCtx = metadata.NewOutgoingContext(clientCtx, md)
+
+	span, clientCtx := opentracing.StartSpanFromContext(clientCtx, "authorization")
+
+	defer span.Finish()
 
 	_, err := authInterceptor.AccessV1Client.Check(clientCtx, &accessDesc.CheckRequest{
 		EndpointAddress: info.FullMethod,
@@ -65,6 +70,7 @@ func NewAuthInterceptor() *AuthInterceptor {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(":%d", authPort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),		
 	)
 
 	if err != nil {

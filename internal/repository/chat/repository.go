@@ -3,7 +3,6 @@ package chat
 import (
 	"context"
 	"fmt"
-	"log"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/Oleg-Pro/chat-server/internal/model"
@@ -38,7 +37,6 @@ func (r *repo) Create(ctx context.Context, info *model.ChatInfo) (int64, error) 
 
 	query, args, err := builderInsert.ToSql()
 	if err != nil {
-		log.Printf("Failed to build insert query: %v", err)
 		return 0, err
 	}
 
@@ -51,7 +49,6 @@ func (r *repo) Create(ctx context.Context, info *model.ChatInfo) (int64, error) 
 
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&userID)
 	if err != nil {
-		log.Printf("Failed to insert chat: %v", err)
 		return 0, err
 	}
 
@@ -66,7 +63,6 @@ func (r *repo) Delete(ctx context.Context, id int64) (int64, error) {
 
 	query, args, err := builderDelete.ToSql()
 	if err != nil {
-		log.Printf("Failed to build delete query: %v", err)
 		return 0, err
 	}
 
@@ -77,7 +73,6 @@ func (r *repo) Delete(ctx context.Context, id int64) (int64, error) {
 
 	res, err := r.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
-		log.Printf("Failed to delete chat with id %d: %v", id, err)
 		return 0, err
 	}
 

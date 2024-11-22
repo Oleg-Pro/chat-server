@@ -2,6 +2,8 @@ version: '3'
 
 volumes:
   chat_server_postgres_volume:  
+  prometheus_data:
+  grafana_data:  
 
 services:
   pg_chat-server:
@@ -21,4 +23,34 @@ services:
       dockerfile: migration.Dockerfile
     restart: on-failure      
 
+  prometheus:
+    image: prom/prometheus:v2.37.9
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus_data:/prometheus
+    network_mode: host  # Добавил, чтобы можно было обращаться к хосту как localhost
+#    extra_hosts:
+#    - "host.docker.internal:host-gateway" Не помогает, чтобы заработал host.docker.internal
 
+
+  grafana:
+    image: grafana/grafana-oss:10.0.3
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana    
+    network_mode: host  # Добавил, чтобы можно было обращаться к хосту как localhost      
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.48
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp" # jaeger-client
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686" # web
+      - "14268:14268"
+      - "9411:9411"
