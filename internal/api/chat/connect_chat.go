@@ -50,7 +50,11 @@ func (i *Implementation) Connect(req *desc.ConnectRequest,stream desc.ChatV1_Con
 				}
 			}
 		case <-stream.Context().Done():
+			// Как понять, какому пользователюя принадленжит стрим и удалить его из мапы?
+			// В запросе нет идентификатора пользоватял, непонятно, как удалять из мапы стрим конкретного пользователя
+
 /*			i.chats[req.GetId()].m.Lock()
+			// Я пробовал в удалять из слайса так, но не работает
 			i.chats[req.GetId()] = slices.DeleteFunc(i.chats[req.GetId()], func(e desc.ChatV1_ConnectServer) bool {
 					e == stream
 			})
