@@ -11,6 +11,7 @@ service ChatV1 {
     rpc Create(CreateRequest) returns (CreateResponse);
     rpc Delete(DeleteRequest) returns (google.protobuf.Empty);    
     rpc SendMessage(SendMessageRequest) returns(google.protobuf.Empty);
+    rpc Connect (ConnectRequest) returns (stream Message);    
 }
 
 message CreateRequest {
@@ -21,12 +22,27 @@ message CreateResponse {
     int64 id = 1;
 };
 
+
 message DeleteRequest {
     int64 id = 1;
 }
 
+
+message ConnectRequest {
+    int64 id = 1;
+}
+
 message SendMessageRequest {
+    int64 chatId = 1;
+    Message message = 2;
+/*    string from = 1;
+    string text = 2;
+    google.protobuf.Timestamp timestamp = 3;  */
+}
+
+message Message {
     string from = 1;
     string text = 2;
-    google.protobuf.Timestamp timestamp = 3;  
-}
+    google.protobuf.Timestamp created_at = 3;
+  }
+  
