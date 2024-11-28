@@ -60,6 +60,7 @@ func main() {
 	log.Printf(color.RedString("Create response \n"), color.GreenString("%v", r))	*/
 
 	wg := sync.WaitGroup{}
+	wg.Add(2)
 
 	chatID	:= int64(1)
 
@@ -69,7 +70,8 @@ func main() {
 
 		err = connectChat(ctx, client, chatID, "user1", 5*time.Second)
 		if err != nil {
-			log.Fatalf("failed to connect chat: %v", err)
+			log.Printf("failed to connect chat1: %v", err)			
+//			log.Fatalf("failed to connect chat1: %v", err)
 		}
 	}()
 
@@ -78,11 +80,13 @@ func main() {
 
 		err = connectChat(ctx, client, chatID, "user2", 7*time.Second)
 		if err != nil {
-			log.Fatalf("failed to connect chat: %v", err)
+			log.Printf("failed to connect chat2: %v", err)						
+//			log.Fatalf("failed to connect chat2: %v", err)
 		}
 	}()
 
 	wg.Wait()
+	log.Println("Chat client exited")
 
 }
 
@@ -92,7 +96,7 @@ func connectChat(ctx context.Context, client desc.ChatV1Client, chatID int64, us
 		Id: chatID,
 	})
 	if err != nil {
-//		log.Println("При запуске клиента падает здесь!!!!!!!!!!!!!")		
+		log.Println("При запуске клиента падает здесь!!!!!!!!!!!!!")		
 		return err
 	}
 
