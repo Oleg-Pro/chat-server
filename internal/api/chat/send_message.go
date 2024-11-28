@@ -17,15 +17,16 @@ func (i *Implementation) SendMessage(ctx context.Context, req *desc.SendMessageR
 	log.Println("SendMessage RLocking")				
 	i.mxChannel.RLock()
 	log.Println("SendMessage RLocked")					
-	chatChannel, ok := i.channels[req.GetChatId()]	
+	chatChannel, ok := i.channels[req.GetChatId()]
 
 	// Если канал для чата еще не создан
 	if !ok {
 		log.Println("SendMessage creating channel for chat")		
 		i.channels[req.GetChatId()] = make(chan *desc.Message, 100)
+		chatChannel, ok = i.channels[req.GetChatId()]				
 	}
 
-	chatChannel, ok = i.channels[req.GetChatId()]		
+
 	if !ok {	
 		log.Println("Strange things happen!)))")
 		return &empty.Empty{}, nil		
