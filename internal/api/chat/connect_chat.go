@@ -31,6 +31,9 @@ func (i *Implementation) Connect(req *desc.ConnectRequest,stream desc.ChatV1_Con
 	i.mxChat.Unlock()	
 
 
+	log.Printf("Connect: %#v", req)					
+
+
 	i.chats[req.GetId()].m.Lock()
 	i.chats[req.GetId()].streams =  append(i.chats[req.GetId()].streams ,stream)
 	i.chats[req.GetId()].m.Unlock()
@@ -43,6 +46,7 @@ func (i *Implementation) Connect(req *desc.ConnectRequest,stream desc.ChatV1_Con
 				return nil
 			}
 
+			
 			for _, stream := range i.chats[req.GetId()].streams {
 				log.Printf("Connect Sending message to client chatId : %d message : %#v", req.GetId(), msg)				
 				if err := stream.Send(msg); err != nil {
@@ -60,6 +64,7 @@ func (i *Implementation) Connect(req *desc.ConnectRequest,stream desc.ChatV1_Con
 			})
 			delete(i.chats[req.GetChatId()].streams, req.GetUsername())
 			i.chats[req.GetId()].m.Unlock()*/
+			log.Println("Connect Context doen exit")
 			return nil
 	
 		}		
@@ -69,7 +74,7 @@ func (i *Implementation) Connect(req *desc.ConnectRequest,stream desc.ChatV1_Con
 
 //	stream.Send(&desc.Message{})
 	//stream.Send(&desc.Message{C Text: "Test", From: "Oleg"})
-	return nil
+//	return nil
 	//return status.Errorf(codes.Unimplemented, "method ConnectChat not implemented1")
 }
 
