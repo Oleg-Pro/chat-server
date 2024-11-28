@@ -24,6 +24,11 @@ type Implementation struct {
 	mxChannel sync.RWMutex
 }
 
+
+func (i *Implementation) CreateChatChannel(id int64) {
+	i.channels[id] = make(chan *desc.Message, 100)	
+}
+
 // NewImplementation create Chat Api implementation
 func NewImplementation(chatService service.ChatService) *Implementation {
 	return &Implementation{

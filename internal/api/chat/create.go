@@ -25,6 +25,8 @@ func (i *Implementation) Create(ctx context.Context, req *desc.CreateRequest) (*
 		return nil, err
 	}
 
+	i.CreateChatChannel(chatID)
+
 	return &desc.CreateResponse{
 		Id: chatID,
 	}, nil
