@@ -2,19 +2,19 @@ package main
 
 import (
 	"context"
-	"flag"	
+	"flag"
 	"io"
 	"log"
 	"sync"
-	"time"	
+	"time"
 
-	"github.com/brianvoe/gofakeit/v6"	
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/fatih/color"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/metadata"	
-	"google.golang.org/protobuf/types/known/timestamppb"	
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var accessToken = flag.String("a", "", "access token")
@@ -25,8 +25,6 @@ const (
 
 func main() {
 	flag.Parse()
-
-
 
 	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -42,36 +40,33 @@ func main() {
 
 	client := desc.NewChatV1Client(conn)
 
-
-
 	ctx := context.Background()
 	md := metadata.New(map[string]string{"Authorization": "Bearer " + *accessToken})
 
 	log.Printf("Access token %s\n", *accessToken)
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
-/*	r, err := client.Create(ctx, &desc.CreateRequest{
-		UserNames: []string{"user1,", "user55"},
-	})
-	if err != nil {
-		log.Fatalf("Failed to User %+v", err)
-	}
+	/*	r, err := client.Create(ctx, &desc.CreateRequest{
+			UserNames: []string{"user1,", "user55"},
+		})
+		if err != nil {
+			log.Fatalf("Failed to User %+v", err)
+		}
 
-	log.Printf(color.RedString("Create response \n"), color.GreenString("%v", r))	*/
+		log.Printf(color.RedString("Create response \n"), color.GreenString("%v", r))	*/
 
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 
-	chatID	:= int64(1)
-
+	chatID := int64(1)
 
 	go func() {
 		defer wg.Done()
 
 		err = connectChat(ctx, client, chatID, "user1", 5*time.Second)
 		if err != nil {
-			log.Printf("failed to connect chat1: %v", err)			
-//			log.Fatalf("failed to connect chat1: %v", err)
+			log.Printf("failed to connect chat1: %v", err)
+			//			log.Fatalf("failed to connect chat1: %v", err)
 		}
 	}()
 
@@ -80,8 +75,8 @@ func main() {
 
 		err = connectChat(ctx, client, chatID, "user2", 7*time.Second)
 		if err != nil {
-			log.Printf("failed to connect chat2: %v", err)						
-//			log.Fatalf("failed to connect chat2: %v", err)
+			log.Printf("failed to connect chat2: %v", err)
+			//			log.Fatalf("failed to connect chat2: %v", err)
 		}
 	}()
 
@@ -90,13 +85,13 @@ func main() {
 
 }
 
-
 func connectChat(ctx context.Context, client desc.ChatV1Client, chatID int64, username string, period time.Duration) error {
 	stream, err := client.Connect(ctx, &desc.ConnectRequest{
-		Id: chatID,
+		ChatId:   chatID,
+		Username: "oleg",
 	})
 	if err != nil {
-		log.Println("При запуске клиента падает здесь!!!!!!!!!!!!!")		
+		log.Println("При запуске клиента падает здесь!!!!!!!!!!!!!")
 		return err
 	}
 
@@ -159,7 +154,6 @@ func connectChat(ctx context.Context, client desc.ChatV1Client, chatID int64, us
 		}
 	}
 }
-
 
 /*func main() {
 	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))

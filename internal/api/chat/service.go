@@ -1,16 +1,17 @@
 package chat
 
 import (
-	"sync"	
+	"sync"
+
 	"github.com/Oleg-Pro/chat-server/internal/service"
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
 )
 
+// Chat user streams
 type Chat struct {
 	streams map[string]desc.ChatV1_ConnectServer
 	m       sync.RWMutex
 }
-
 
 // Implementation implementation of Chat API
 type Implementation struct {
@@ -24,16 +25,16 @@ type Implementation struct {
 	mxChannel sync.RWMutex
 }
 
-
+// CreateChatChannel create channel for chat messages
 func (i *Implementation) CreateChatChannel(id int64) {
-	i.channels[id] = make(chan *desc.Message, 100)	
+	i.channels[id] = make(chan *desc.Message, 100)
 }
 
 // NewImplementation create Chat Api implementation
 func NewImplementation(chatService service.ChatService) *Implementation {
 	return &Implementation{
 		chatService: chatService,
-		chats:    make(map[int64]*Chat),
-		channels: make(map[int64]chan *desc.Message),
+		chats:       make(map[int64]*Chat),
+		channels:    make(map[int64]chan *desc.Message),
 	}
 }
