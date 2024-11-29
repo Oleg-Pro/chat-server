@@ -15,7 +15,7 @@ import (
 
 func (i *Implementation) Connect(req *desc.ConnectRequest,stream desc.ChatV1_ConnectServer) error {
 	i.mxChannel.RLock()
-	chatChan, ok := i.channels[req.GetId()]
+	chatChan, ok := i.channels[req.GetChatId()]
 	i.mxChannel.RUnlock()
 
 	if !ok {
@@ -23,9 +23,9 @@ func (i *Implementation) Connect(req *desc.ConnectRequest,stream desc.ChatV1_Con
 	}
 
 	i.mxChat.Lock()
-	if _, okChat := i.chats[req.GetId()]; !okChat {
-		i.chats[req.GetId()] = &Chat{
-			streams: make([]desc.ChatV1_ConnectServer, 0, 10),
+	if _, okChat := i.chats[req.GetChatId()]; !okChat {
+		i.chats[req.GetChatId()] = &Chat{
+			streams: make(map[string]desc.ChatV1_ConnectServer),
 		}
 	}
 	i.mxChat.Unlock()	
@@ -34,9 +34,9 @@ func (i *Implementation) Connect(req *desc.ConnectRequest,stream desc.ChatV1_Con
 	log.Printf("Connect: %#v", req)					
 
 
-	i.chats[req.GetId()].m.Lock()
-	i.chats[req.GetId()].streams =  append(i.chats[req.GetId()].streams ,stream)
-	i.chats[req.GetId()].m.Unlock()
+	i.chats[req.GetChatId()].m.Lock()
+	i.chats[req.GetChatId()].streams[req.GetUsername()] = stream
+	i.chats[req.GetChatId()].m.Unlock()
 
 
 	for {
@@ -47,8 +47,8 @@ func (i *Implementation) Connect(req *desc.ConnectRequest,stream desc.ChatV1_Con
 			}
 
 			
-			for _, stream := range i.chats[req.GetId()].streams {
-				log.Printf("Connect Sending message to client chatId : %d message : %#v", req.GetId(), msg)				
+			for _, stream := range i.chats[req.GetChatId()].streams {
+				log.Printf("Connect Sending message to client chatId : %d message : %#v", req.GetChatId(), msg)				
 				if err := stream.Send(msg); err != nil {
 					return err
 				}

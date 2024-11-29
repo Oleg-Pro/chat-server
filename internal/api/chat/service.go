@@ -7,7 +7,7 @@ import (
 )
 
 type Chat struct {
-	streams []desc.ChatV1_ConnectServer
+	streams map[string]desc.ChatV1_ConnectServer
 	m       sync.RWMutex
 }
 
