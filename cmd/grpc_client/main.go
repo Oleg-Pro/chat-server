@@ -79,7 +79,6 @@ func main() {
 	}()
 
 	wg.Wait()
-	log.Println("Chat client exited")
 
 }
 
