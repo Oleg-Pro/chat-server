@@ -58,7 +58,7 @@ func main() {
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 
-	chatID := int64(1)
+	chatID := int64(26)
 
 	go func() {
 		defer wg.Done()
@@ -86,12 +86,12 @@ func main() {
 }
 
 func connectChat(ctx context.Context, client desc.ChatV1Client, chatID int64, username string, period time.Duration) error {
+	log.Printf("User %s connecting to chat %d\n", username, chatID)
 	stream, err := client.Connect(ctx, &desc.ConnectRequest{
 		ChatId:   chatID,
 		Username: "oleg",
 	})
 	if err != nil {
-		log.Println("При запуске клиента падает здесь!!!!!!!!!!!!!")
 		return err
 	}
 
