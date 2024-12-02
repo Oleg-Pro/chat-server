@@ -46,19 +46,19 @@ func main() {
 	log.Printf("Access token %s\n", *accessToken)
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
-	/*	r, err := client.Create(ctx, &desc.CreateRequest{
-			UserNames: []string{"user1,", "user55"},
-		})
-		if err != nil {
-			log.Fatalf("Failed to User %+v", err)
-		}
+	r, err := client.Create(ctx, &desc.CreateRequest{
+		UserNames: []string{"user1,", "user55"},
+	})
+	if err != nil {
+		log.Fatalf("Failed to User %+v", err)
+	}
 
-		log.Printf(color.RedString("Create response \n"), color.GreenString("%v", r))	*/
+	log.Printf(color.RedString("Create response \n"), color.GreenString("%v", r))
 
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 
-	chatID := int64(26)
+	chatID := r.GetId()
 
 	go func() {
 		defer wg.Done()
@@ -66,7 +66,6 @@ func main() {
 		err = connectChat(ctx, client, chatID, "user1", 5*time.Second)
 		if err != nil {
 			log.Printf("failed to connect chat1: %v", err)
-			//			log.Fatalf("failed to connect chat1: %v", err)
 		}
 	}()
 
@@ -76,7 +75,6 @@ func main() {
 		err = connectChat(ctx, client, chatID, "user2", 7*time.Second)
 		if err != nil {
 			log.Printf("failed to connect chat2: %v", err)
-			//			log.Fatalf("failed to connect chat2: %v", err)
 		}
 	}()
 
@@ -115,27 +113,6 @@ func connectChat(ctx context.Context, client desc.ChatV1Client, chatID int64, us
 	}()
 
 	for {
-		// Ниже пример того, как можно считывать сообщения из консоли
-		// в демонстрационных целях будем засылать в чат рандомный текст раз в 5 секунд
-		//scanner := bufio.NewScanner(os.Stdin)
-		//var lines strings.Builder
-		//
-		//for {
-		//	scanner.Scan()
-		//	line := scanner.Text()
-		//	if len(line) == 0 {
-		//		break
-		//	}
-		//
-		//	lines.WriteString(line)
-		//	lines.WriteString("\n")
-		//}
-		//
-		//err = scanner.Err()
-		//if err != nil {
-		//	log.Println("failed to scan message: ", err)
-		//}
-
 		time.Sleep(period)
 
 		text := gofakeit.Word()
@@ -154,33 +131,3 @@ func connectChat(ctx context.Context, client desc.ChatV1Client, chatID int64, us
 		}
 	}
 }
-
-/*func main() {
-	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("failed to connect to server: %v", err)
-	}
-
-	defer func() {
-		err := conn.Close()
-		if err != nil {
-			log.Fatalf("Failed to close connection %v", err)
-		}
-	}()
-
-	client := desc.NewChatV1Client(conn)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-
-	defer cancel()
-
-	r, err := client.Create(ctx, &desc.CreateRequest{
-		UserNames: []string{"user1,", "user2"},
-	})
-	if err != nil {
-		log.Fatalf("Failed to User %+v", err)
-	}
-
-	log.Printf(color.RedString("Create response \n"), color.GreenString("%v", r))
-
-}*/

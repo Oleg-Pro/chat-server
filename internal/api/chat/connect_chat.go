@@ -1,15 +1,11 @@
 package chat
 
 import (
-	// "context"
-	// "database/sql"
 	"log"
-	//	"github.com/Oleg-Pro/chat-server/internal/model"
+
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
-	//	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	//	"slices"
 )
 
 // Connect connect chat
@@ -57,12 +53,4 @@ func (i *Implementation) Connect(req *desc.ConnectRequest, stream desc.ChatV1_Co
 
 		}
 	}
-
-	//	stream.Send(&desc.Message{})
-	//
-	// stream.Send(&desc.Message{C Text: "Test", From: "Oleg"})
-	//
-	//	return nil
-	//
-	// return status.Errorf(codes.Unimplemented, "method ConnectChat not implemented1")
 }
