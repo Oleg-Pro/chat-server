@@ -31,7 +31,6 @@ message DeleteRequest {
 message ConnectRequest {
     int64 chatId = 1;
     string username = 2;
-
 }
 
 message SendMessageRequest {
