@@ -2,32 +2,25 @@ package chat
 
 import (
 	"context"
-	"database/sql"
 
-	"github.com/Oleg-Pro/chat-server/internal/model"
 	desc "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
 	empty "github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // SendMessage send message
-func (i *Implementation) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*empty.Empty, error) {
-	var timestamp sql.NullTime
-	if req.GetTimestamp() == nil {
-		timestamp.Valid = false
+func (i *Implementation) SendMessage(_ context.Context, req *desc.SendMessageRequest) (*empty.Empty, error) {
+	i.mxChannel.RLock()
+	chatChannel, ok := i.channels[req.GetChatId()]
 
-	} else {
-		timestamp.Time = req.GetTimestamp().AsTime()
+	if !ok {
+		return nil, status.Errorf(codes.NotFound, "chat not found")
 	}
 
-	err := i.chatService.SendMessage(ctx, &model.MessageInfo{
-		From:      req.GetFrom(),
-		Text:      req.GetText(),
-		Timestamp: timestamp,
-	})
+	i.mxChannel.RUnlock()
 
-	if err != nil {
-		return nil, err
-	}
+	chatChannel <- req.GetMessage()
 
 	return &empty.Empty{}, nil
 }
